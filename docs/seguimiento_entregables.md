@@ -2,13 +2,13 @@
 
 | Requisito | Trabajo preparado | Estado verificable |
 |---|---|---|
-| 1. Selección de tecnología | Justificación de PostgreSQL frente a los criterios de replicación, rendimiento, escalabilidad y facilidad de uso en `informe/informe_tecnico.md` | Redactado; el informe todavía necesita completar nombres del grupo y resultados. |
-| 2. Diseño de arquitectura | Dos nodos activos, publicación/suscripción, sincronización asíncrona, reglas de conflicto y seguridad en `docs/arquitectura.md` y el informe | Diseñado; pendiente incorporar el diagrama final que usará el grupo. |
+| 1. Selección de tecnología | Justificación de PostgreSQL frente a los criterios de replicación, rendimiento, escalabilidad y facilidad de uso en `informe/informe_tecnico.md` | Redactado con evidencia de una medición real; falta confirmar la discrepancia de puntaje de la rúbrica. |
+| 2. Diseño de arquitectura | Dos nodos activos, publicación/suscripción, sincronización asíncrona, reglas de conflicto y seguridad en `docs/arquitectura.md` y el informe | Diagrama final disponible en `docs/arquitectura.svg` y en la presentación. |
 | 3. Implementación | Dos clústeres PostgreSQL 18 locales, esquema SQL, ejemplos de ventas, inicio, detención y configuración de suscripciones con PowerShell | Ejecutados en puertos 5433 y 5434; la instancia en 5432 se mantiene aparte. |
 | 4. Evaluación y pruebas | Pruebas de ida y vuelta, integridad, interrupción, conflicto/recuperación y medición básica | P01-P09 ejecutadas; dos filas concurrentes de P05 permanecen como evidencia en los nodos. Ver `docs/plan_pruebas.md` y CSV de rendimiento. |
-| 5. Informe técnico | Borrador con problema, elección, arquitectura, implementación, pruebas, conclusiones y recomendaciones | Borrador en Markdown; la copia DOCX se generó localmente pero no se incorpora al repositorio hasta contar con renderizado visual satisfactorio. |
+| 5. Informe técnico | Informe con problema, elección, arquitectura, implementación, pruebas, conclusiones y recomendaciones | Markdown, DOCX y PDF generados y revisados visualmente; faltan completar integrantes, docente y fecha de entrega. |
 | Código fuente | SQL y scripts del proyecto | Preparado en esta carpeta, independiente de `GYM_CONTROL`. |
-| Presentación oral | Guion de siete diapositivas con lo que se debe explicar | Preparado; se agregará evidencia de la demostración después de ejecutar las pruebas. |
+| Presentación oral | Guion de ocho diapositivas y presentación editable | Preparados con datos de las pruebas ejecutadas. |
 
 ## Rúbrica leída del PDF
 
@@ -25,7 +25,7 @@ El enunciado dice que el proyecto vale 12 puntos, pero los cinco valores de la r
 
 ## Pendientes para cerrar el proyecto
 
-- Revisar las conexiones desde pgAdmin y guardar capturas de evidencia.
-- Completar autores, docente y fecha del informe.
-- Renderizar y revisar visualmente la versión final DOCX; actualizar la exposición con los resultados observados.
-- Confirmar las conexiones guardadas en pgAdmin y publicar el repositorio separado en el perfil autorizado.
+- Revisar las conexiones guardadas desde pgAdmin y guardar capturas de evidencia.
+- Completar integrantes, docente y fecha de entrega.
+- Confirmar con el docente si el puntaje total es 12 o 13.
+- Entregar la URL del repositorio privado al equipo e invitar a sus integrantes si trabajarán directamente en GitHub.

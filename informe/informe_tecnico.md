@@ -1,20 +1,18 @@
-# Trabajo de Fin de Semestre: Replicación de Base de Datos
+# Informe técnico de replicación para una cadena de farmacias
 
 ## Sistema de replicación para una cadena de farmacias
 
-**Curso:** Infraestructura de Tecnología de Información  
-**Escuela Profesional:** Ingeniería de Sistemas  
-**Integrantes:** Pendiente  
-**Docente:** Pendiente  
-**Fecha:** Pendiente
-
-> Borrador de trabajo. Los resultados de pruebas se completarán con evidencia después de ejecutar la solución. No se deben presentar resultados pendientes como si ya hubieran sido medidos.
+**Curso:** Infraestructura de Tecnología de Información
+**Escuela Profesional:** Ingeniería de Sistemas
+**Integrantes:** Completar con los nombres del grupo
+**Docente:** Completar
+**Fecha de entrega:** Completar
 
 ## Resumen
 
-Este proyecto propone y desarrolla una demostración académica de replicación bidireccional lógica entre dos instancias PostgreSQL. El caso de uso es una cadena de farmacias con dos sucursales que registran ventas y movimientos de inventario de forma local. Cada instancia publica sus cambios y recibe los cambios de la otra. Dos clústeres locales independientes, iniciados mediante scripts PowerShell, permiten ejecutar los nodos en una computadora; pgAdmin permite administrarlos y observar los datos.
+Este proyecto diseña e implementa una demostración académica de replicación lógica bidireccional entre dos instancias PostgreSQL para una cadena de farmacias. Cada sucursal registra ventas y cambios de inventario en su nodo y recibe las operaciones de la otra sede. Dos clústeres locales independientes permiten probar el mecanismo en una computadora; pgAdmin permite administrar y consultar cada nodo.
 
-La solución prioriza una instalación reproducible y comprensible para un proyecto universitario. Para reducir conflictos, las ventas usan UUID y cada sucursal modifica el inventario que le pertenece. La replicación es asíncrona: el cambio se confirma primero en el nodo local y luego llega al otro. PostgreSQL puede detener la aplicación de una transacción ante ciertos conflictos; el diseño incluye una regla de prevención y un procedimiento manual de diagnóstico y recuperación.
+Las pruebas confirmaron la replicación en ambos sentidos, la recuperación después de detener un nodo, la detección y resolución de un conflicto de clave única y la convergencia de inserciones simultáneas con UUID distintos. Una carga de 100 ventas convergió en una ejecución observada de 66.9 ms después del inicio del sondeo. Esa medida incluye la invocación del cliente y el sondeo, por lo que describe esta demostración local y no una latencia de red de producción.
 
 ## 1. Descripción del problema
 
@@ -116,7 +114,7 @@ El esquema incluye sucursales, medicamentos, inventario por sucursal, ventas y l
 
 ### Estado de ejecución
 
-Los scripts y archivos de configuración están preparados. La prueba de integración y las mediciones siguen pendientes; no se afirma todavía que los nodos se hayan iniciado ni que los datos se hayan replicado.
+Los dos clústeres PostgreSQL 18.6 se iniciaron en los puertos 5433 y 5434. Los scripts `iniciar.ps1`, `detener.ps1`, `verificar.ps1`, `medir-replicacion.ps1` y `prueba-concurrente.ps1` administran y evalúan los nodos. Los datos de cada clúster quedan bajo `%LOCALAPPDATA%\FarmaciaReplicacion`, fuera de la carpeta del repositorio.
 
 ## 6. Evaluación y pruebas
 
@@ -126,7 +124,6 @@ El plan completo está en `docs/plan_pruebas.md`. Incluye el estado inicial, rep
 
 | Prueba | Resultado | Evidencia |
 |---|---|---|
-| Inicio de los dos clústeres locales | Pendiente | Requiere ejecutar `scripts/iniciar.ps1` en el equipo. |
 | Inicio y suscripciones | Aprobada | Ambos clústeres PostgreSQL 18.6 iniciaron en 5433 y 5434; las dos suscripciones quedaron habilitadas. |
 | Replicación en ambos sentidos | Aprobada | Se ejecutaron las demostraciones A→B y B→A; ambos nodos mostraron las dos ventas y sus detalles. |
 | Consistencia e integridad | Aprobada | La consulta de registros huérfanos devolvió 0 en cada nodo. |
@@ -135,21 +132,21 @@ El plan completo está en `docs/plan_pruebas.md`. Incluye el estado inicial, rep
 | Rendimiento | Medición inicial | Para 100 ventas: inserción local 78.5 ms; convergencia observada 66.9 ms en una ejecución. Incluye la invocación del cliente y el sondeo, no representa latencia pura ni una prueba estadística. |
 | Escrituras simultáneas en nodos distintos | Aprobada | Dos ventas con UUID diferentes se insertaron en paralelo y ambas convergieron en los dos nodos; el marcador reproducible está en `docs/plan_pruebas.md`. |
 
-La medición se realizó el 24 de noviembre de 2026 en una computadora con Windows y PostgreSQL 18.6, usando dos nodos locales. Una sola ejecución no permite generalizar el resultado a otros equipos o redes. Los datos brutos están en `informe/resultados_rendimiento.csv`.
+La medición se realizó el 24 de noviembre de 2026 en Windows con PostgreSQL 18.6 y dos nodos locales. El CSV conserva el resultado; una sola ejecución no permite generalizarlo a otros equipos o redes.
 
 ## 7. Limitaciones
 
 - La replicación es asíncrona y puede tener retraso.
-- La configuración no incluye consenso, balanceador, descubrimiento automático de nodo activo ni failover transparente.
-- La topología tiene dos nodos locales dentro de un equipo; no reproduce la latencia ni las fallas de dos sedes físicas.
-- Los conflictos que violan restricciones pueden detener el worker y necesitar intervención manual.
-- El modelo de farmacias es didáctico, no administra recetas, datos clínicos ni información de clientes reales.
+- No incluye consenso ni failover transparente.
+- Los dos nodos corren en un equipo; la prueba no simula sedes físicas.
+- Una restricción violada puede detener el worker y requerir intervención.
+- El modelo es ficticio y no procesa datos de pacientes ni recetas reales.
 
 ## 8. Conclusiones y recomendaciones
 
-PostgreSQL permite construir una demostración entendible de replicación lógica bidireccional con dos nodos, y pgAdmin facilita inspeccionar el resultado. Separar el inventario por sucursal y usar UUID en las ventas ayuda a que las escrituras normales de ambas sedes no compitan por las mismas claves.
+La demostración confirmó la propagación entre nodos y la utilidad de asignar las filas de inventario a cada sede. Los UUID reducen las colisiones entre identificadores de venta.
 
-La replicación no elimina la necesidad de reglas de negocio. Para un entorno real se recomendaría evaluar requisitos de consistencia, resolución de conflictos, operación de sedes y recuperación ante desastres con una solución distribuida soportada, controles de seguridad más estrictos, monitoreo y copias de seguridad verificadas.
+Una farmacia real necesitaría definir controles de red, monitoreo, respaldos y una política de resolución de conflictos. Esta demostración local no incluye failover transparente.
 
 ## 9. Criterios de evaluación del enunciado
 
@@ -162,13 +159,13 @@ La replicación no elimina la necesidad de reglas de negocio. Para un entorno re
 | Calidad de documentación y presentación oral | 2 |
 | **Suma de la rúbrica** | **13** |
 
-El objetivo del documento indica que el proyecto vale 12 puntos, mientras que los valores de la rúbrica suman 13. Se debe confirmar con el docente qué total aplicar; este informe conserva los valores tal como aparecen en la tabla de evaluación.
+El enunciado anuncia 12 puntos, pero la rúbrica suma 13. Confirmar el puntaje con el docente.
 
 ## Referencias
 
-- PostgreSQL Global Development Group. *Logical Replication*. https://www.postgresql.org/docs/18/logical-replication.html
-- PostgreSQL Global Development Group. *CREATE SUBSCRIPTION*, opción `origin`. https://www.postgresql.org/docs/18/sql-createsubscription.html
-- PostgreSQL Global Development Group. *Conflicts*. https://www.postgresql.org/docs/18/logical-replication-conflicts.html
-- PostgreSQL Global Development Group. *Versioning Policy*. https://www.postgresql.org/support/versioning/
-- pgAdmin Development Team. *pgAdmin 4 Documentation*. https://www.pgadmin.org/docs/pgadmin4/latest/
-- Enunciado del Trabajo de Fin de Semestre: Replicación de Base de Datos, curso de Infraestructura de Tecnología de Información.
+- PostgreSQL 18, Logical Replication: https://www.postgresql.org/docs/18/logical-replication.html
+- PostgreSQL 18, CREATE SUBSCRIPTION: https://www.postgresql.org/docs/18/sql-createsubscription.html
+- PostgreSQL 18, Conflicts: https://www.postgresql.org/docs/18/logical-replication-conflicts.html
+- Política de soporte de versiones de PostgreSQL: https://www.postgresql.org/support/versioning/
+- Documentación de pgAdmin 4: https://www.pgadmin.org/docs/pgadmin4/latest/
+- Enunciado del Trabajo de Fin de Semestre, curso de Infraestructura de Tecnología de Información.

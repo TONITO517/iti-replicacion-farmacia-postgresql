@@ -32,11 +32,11 @@ Las contraseñas de ejemplo están en `.env` local. La guía con demostración, 
 - `database/`: esquema, publicaciones y datos de demostración/conflicto.
 - `scripts/`: inicio, detención, verificación y medición.
 - `docs/`: arquitectura, instalación, pruebas y resolución de conflictos.
-- `informe/`: informe técnico en Markdown.
-- `presentacion/`: guion de exposición oral.
+- `informe/`: informe técnico editable en DOCX y PDF, con fuente Markdown y resultados CSV.
+- `presentacion/`: presentación editable PPTX y guion de exposición oral.
 
 ## Estado
 
-Los dos clústeres se iniciaron y se probaron la replicación en ambos sentidos, las escrituras concurrentes, la interrupción temporal, la recuperación de un conflicto y una medición básica. Falta guardar capturas desde pgAdmin; ver [`docs/seguimiento_entregables.md`](docs/seguimiento_entregables.md) y [`docs/plan_pruebas.md`](docs/plan_pruebas.md). No se deben presentar resultados pendientes como ya medidos.
+Los dos clústeres se iniciaron y se probaron la replicación en ambos sentidos, las escrituras concurrentes, la interrupción temporal, la recuperación de un conflicto y una medición básica. Los resultados están asentados en el informe y el plan de pruebas. Falta completar los datos del grupo y guardar capturas desde pgAdmin; ver [`docs/seguimiento_entregables.md`](docs/seguimiento_entregables.md).
 
 Este proyecto está en su propia carpeta y repositorio, separado de `GYM_CONTROL`. Es una demostración académica local con datos ficticios, no una configuración de producción.
