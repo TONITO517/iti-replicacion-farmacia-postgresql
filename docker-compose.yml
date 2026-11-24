@@ -1,0 +1,89 @@
+services:
+  nodo-a:
+    image: postgres:16
+    container_name: farmacia-nodo-a
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-farmacia}
+      POSTGRES_USER: ${POSTGRES_USER:-farmacia_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-FarmaciaLocal2026}
+      REPLICATION_USER: ${REPLICATION_USER:-replicador}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD:-ReplicacionLocal2026}
+    command:
+      - postgres
+      - -c
+      - wal_level=logical
+      - -c
+      - max_replication_slots=10
+      - -c
+      - max_wal_senders=10
+      - -c
+      - listen_addresses=*
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - nodo_a_datos:/var/lib/postgresql/data
+      - ./database/init/00-crear-rol.sh:/docker-entrypoint-initdb.d/00-crear-rol.sh:ro
+      - ./database/init/01-esquema.sql:/docker-entrypoint-initdb.d/01-esquema.sql:ro
+      - ./database/init/02-publicacion.sql:/docker-entrypoint-initdb.d/02-publicacion.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  nodo-b:
+    image: postgres:16
+    container_name: farmacia-nodo-b
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-farmacia}
+      POSTGRES_USER: ${POSTGRES_USER:-farmacia_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-FarmaciaLocal2026}
+      REPLICATION_USER: ${REPLICATION_USER:-replicador}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD:-ReplicacionLocal2026}
+    command:
+      - postgres
+      - -c
+      - wal_level=logical
+      - -c
+      - max_replication_slots=10
+      - -c
+      - max_wal_senders=10
+      - -c
+      - listen_addresses=*
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - nodo_b_datos:/var/lib/postgresql/data
+      - ./database/init/00-crear-rol.sh:/docker-entrypoint-initdb.d/00-crear-rol.sh:ro
+      - ./database/init/01-esquema.sql:/docker-entrypoint-initdb.d/01-esquema.sql:ro
+      - ./database/init/02-publicacion.sql:/docker-entrypoint-initdb.d/02-publicacion.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  configurar-replicacion:
+    image: postgres:16
+    container_name: farmacia-configurar-replicacion
+    depends_on:
+      nodo-a:
+        condition: service_healthy
+      nodo-b:
+        condition: service_healthy
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-farmacia}
+      POSTGRES_USER: ${POSTGRES_USER:-farmacia_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-FarmaciaLocal2026}
+      REPLICATION_USER: ${REPLICATION_USER:-replicador}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD:-ReplicacionLocal2026}
+    volumes:
+      - ./scripts/configurar-replicacion.sh:/scripts/configurar-replicacion.sh:ro
+    entrypoint: ["bash", "/scripts/configurar-replicacion.sh"]
+    restart: "no"
+
+volumes:
+  nodo_a_datos:
+  nodo_b_datos:
