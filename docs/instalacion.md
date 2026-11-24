@@ -60,6 +60,7 @@ No se debe conectar el proyecto a `BOLETA_VENTAS`; esa es una base aparte del se
    ```
 
 5. Para revisar el estado de las suscripciones, ejecutar `scripts/verificar.ps1`.
+6. Para realizar una medición sencilla con 100 ventas ficticias, ejecutar `scripts/medir-replicacion.ps1`. Se puede cambiar la cantidad con `-Cantidad 250`; los resultados se guardan en `informe/resultados_rendimiento.csv`.
 
 ## Detener y conservar datos
 
@@ -76,5 +77,7 @@ Este comando detiene y elimina los contenedores, pero conserva los volúmenes de
 - `docker compose logs configurar-replicacion`: revisar el arranque de las suscripciones.
 - `docker compose exec nodo-a psql -U farmacia_admin -d farmacia -c "SELECT * FROM pg_stat_subscription;"`: ver actividad de replicación.
 - Si aparece un error de contraseña o una réplica detenida, conservar el mensaje completo y revisar el apartado de conflictos antes de reiniciar o borrar volúmenes.
+
+La medición registra el tiempo del comando de inserción local y cuánto tardó el sondeo en observar todas las filas en el destino. Incluye el costo de invocar `docker compose` y el intervalo de sondeo, así que sirve como comparación de la demo, no como benchmark de red ni como cifra de producción.
 
 Las contraseñas del `.env` de ejemplo son únicamente para la demo local. No usar estos valores en un servidor expuesto a Internet.

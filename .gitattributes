@@ -3,4 +3,8 @@
 *.sh text eol=lf
 *.sql text eol=lf
 *.yml text eol=lf
+*.py text eol=lf
+*.ps1 text eol=crlf
+.gitignore text eol=lf
+.gitattributes text eol=lf
 .env.example text eol=lf

@@ -14,12 +14,25 @@ En replicación lógica nativa, un cambio remoto que infringe una restricción (
 
 La prueba usa dos medicamentos ficticios con UUID diferentes, pero el mismo `codigo` único. Solo debe ejecutarse en la base descartable del proyecto.
 
-1. En Nodo A, deshabilitar la suscripción `sub_desde_nodo_b`. En Nodo B, deshabilitar `sub_desde_nodo_a`.
+1. En Query Tool del Nodo A ejecutar `ALTER SUBSCRIPTION sub_desde_nodo_b DISABLE;`. En Nodo B ejecutar `ALTER SUBSCRIPTION sub_desde_nodo_a DISABLE;`.
 2. Ejecutar `database/conflicto_nodo_a.sql` en Nodo A y `database/conflicto_nodo_b.sql` en Nodo B.
-3. Habilitar ambas suscripciones. Cada nodo intentará recibir el medicamento de la otra sucursal y el worker chocará con la restricción única `medicamento_codigo_key`.
+3. En Nodo A ejecutar `ALTER SUBSCRIPTION sub_desde_nodo_b ENABLE;`; en Nodo B ejecutar `ALTER SUBSCRIPTION sub_desde_nodo_a ENABLE;`. Cada nodo intentará recibir el medicamento de la otra sucursal y el worker chocará con la restricción única `medicamento_codigo_key`.
 4. Revisar el registro con `docker compose logs nodo-a nodo-b` y `pg_stat_subscription_stats` en pgAdmin. Guardar la evidencia del error.
-5. Deshabilitar otra vez ambas suscripciones. En Nodo A, cambiar el código local a `MED-DUP-CONFLICTO-A`; en Nodo B, cambiarlo a `MED-DUP-CONFLICTO-B`.
-6. Habilitar las dos suscripciones y esperar a que procesen los cambios pendientes.
+5. Deshabilitar otra vez ambas suscripciones como en el paso 1. En Nodo A ejecutar:
+
+   ```sql
+   UPDATE medicamento SET codigo = 'MED-DUP-CONFLICTO-A'
+   WHERE medicamento_id = '20000000-0000-4000-8000-000000000001';
+   ```
+
+   En Nodo B ejecutar:
+
+   ```sql
+   UPDATE medicamento SET codigo = 'MED-DUP-CONFLICTO-B'
+   WHERE medicamento_id = '20000000-0000-4000-8000-000000000002';
+   ```
+
+6. Habilitar `sub_desde_nodo_b` en Nodo A y `sub_desde_nodo_a` en Nodo B; esperar a que procesen los cambios pendientes.
 7. Consultar la tabla `medicamento` en ambos nodos. Deben existir los dos UUID, con códigos distintos, y las dos suscripciones deben estar activas.
 
 La reparación conserva ambos medicamentos ficticios y resuelve la colisión de la clave de negocio cambiando los códigos para que sean únicos. Si un conflicto involucra ventas reales, se debe decidir con el responsable del negocio; no borrar ni alterar una venta para ocultar el error.

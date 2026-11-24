@@ -12,6 +12,7 @@ Las pruebas se realizarán con datos ficticios en los dos nodos locales. Antes d
 | P06 | Interrupción temporal | Detener Nodo B, insertar una venta en A, volver a iniciar B | Al restablecer conexión, el cambio pendiente llega a B |
 | P07 | Conflicto de clave única | Insertar medicamentos con UUID distintos y el mismo código en ambos nodos con suscripciones deshabilitadas; habilitarlas | Los workers reportan conflicto por el código duplicado y se conserva evidencia |
 | P08 | Recuperación del conflicto | Deshabilitar, asignar un código único a cada medicamento y volver a habilitar las suscripciones | Ambos nodos terminan con las dos filas y los workers continúan |
+| P09 | Medición básica de rendimiento | Ejecutar `scripts/medir-replicacion.ps1` con 100 filas y guardar el CSV generado | Se registran filas, tiempo de inserción local y tiempo observado hasta convergencia; se describe el límite del método |
 
 ## Registro de resultados
 
