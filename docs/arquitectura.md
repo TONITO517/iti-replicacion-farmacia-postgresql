@@ -38,14 +38,13 @@ La replicación lógica no hace que las dos instancias funcionen como un clúste
 
 ## Seguridad del entorno didáctico
 
-- Los puertos de los contenedores se exponen solo a `localhost`.
+- Los puertos de ambos servidores se enlazan solo a `127.0.0.1`.
 - Se usarán credenciales locales de desarrollo distintas de las cuentas reales del equipo.
 - No se guardarán contraseñas personales ni datos reales de pacientes o clientes.
 - pgAdmin sirve para conectarse y administrar; la replicación la realizan los servidores PostgreSQL.
 
-## Pendiente de concretar antes de la implementación
+## Decisiones de implementación
 
-- Fijar la versión exacta de la imagen de PostgreSQL para ambos contenedores.
-- Preparar el esquema, las publicaciones, las suscripciones y el procedimiento idempotente de arranque.
-- Verificar compatibilidad de la topología bidireccional con la versión elegida y documentar cómo se observa y recupera una detención por conflicto.
-- Ejecutar las pruebas del proyecto cuando Docker Desktop esté activo.
+- Se utilizan dos clústeres independientes PostgreSQL 18.6, con puertos 5433 y 5434 y datos bajo `%LOCALAPPDATA%\FarmaciaReplicacion`.
+- Los scripts configuran el esquema, las publicaciones y una suscripción por nodo con `copy_data = false` y `origin = 'none'`.
+- El procedimiento probado para un conflicto único conserva ambos registros, asigna códigos distintos y vuelve a habilitar las suscripciones; los resultados están en `docs/plan_pruebas.md`.

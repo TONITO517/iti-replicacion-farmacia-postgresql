@@ -3,23 +3,22 @@
 ## Requisitos
 
 - Windows 10/11 de 64 bits.
-- Docker Desktop con el motor Linux iniciado.
+- PostgreSQL 18 instalado; se usarán sus herramientas (`initdb`, `pg_ctl` y `psql`).
 - pgAdmin 4 para administrar y consultar las dos instancias.
-- Conexión a Internet la primera vez para descargar la imagen `postgres:16`.
 
-El PostgreSQL 18 instalado en Windows no se modifica. El proyecto levanta dos contenedores PostgreSQL 16 aislados en los puertos 5433 y 5434.
+El proyecto crea dos clústeres PostgreSQL 18 separados bajo `%LOCALAPPDATA%\FarmaciaReplicacion`, en los puertos 5433 y 5434. La instancia que ya usa el puerto 5432 y la base `BOLETA_VENTAS` no se modifican. No se necesita Docker.
 
 ## Inicio
 
-1. Abrir Docker Desktop y esperar a que el motor indique que está activo.
-2. Abrir PowerShell en la carpeta `FARMACIA-REPLICACION`.
+1. Abrir PowerShell en la carpeta `FARMACIA-REPLICACION`.
+2. Revisar `PG_BIN` en `.env.example`; si PostgreSQL 18 está en la ruta estándar, el script la detectará al crear `.env`.
 3. Ejecutar:
 
    ```powershell
    .\scripts\iniciar.ps1
    ```
 
-La primera ejecución crea el archivo local `.env`, descarga la imagen y arranca los dos nodos. La configuración de suscripciones se ejecuta después de que ambos servidores respondan.
+La primera ejecución crea `.env`, inicializa los dos clústeres y configura las suscripciones. Las carpetas de datos quedan fuera del repositorio.
 
 ## Registrar los nodos en pgAdmin
 
@@ -68,16 +67,14 @@ No se debe conectar el proyecto a `BOLETA_VENTAS`; esa es una base aparte del se
 .\scripts\detener.ps1
 ```
 
-Este comando detiene y elimina los contenedores, pero conserva los volúmenes de datos para el próximo inicio.
+Este comando detiene los dos servidores, pero conserva sus carpetas de datos para el próximo inicio.
 
 ## Diagnóstico básico
 
-- `docker ps`: confirmar que los contenedores están activos.
-- `docker compose logs nodo-a nodo-b`: consultar mensajes de PostgreSQL.
-- `docker compose logs configurar-replicacion`: revisar el arranque de las suscripciones.
-- `docker compose exec nodo-a psql -U farmacia_admin -d farmacia -c "SELECT * FROM pg_stat_subscription;"`: ver actividad de replicación.
+- Consultar `%LOCALAPPDATA%\FarmaciaReplicacion\nodo-a\server.log` y `nodo-b\server.log` para revisar los registros.
+- En pgAdmin, consultar `SELECT * FROM pg_stat_subscription;` en cada nodo.
 - Si aparece un error de contraseña o una réplica detenida, conservar el mensaje completo y revisar el apartado de conflictos antes de reiniciar o borrar volúmenes.
 
-La medición registra el tiempo del comando de inserción local y cuánto tardó el sondeo en observar todas las filas en el destino. Incluye el costo de invocar `docker compose` y el intervalo de sondeo, así que sirve como comparación de la demo, no como benchmark de red ni como cifra de producción.
+La medición registra el tiempo del comando de inserción local y cuánto tardó el sondeo en observar todas las filas en el destino. Incluye la invocación de `psql` y el intervalo de sondeo, así que sirve como comparación de la demo, no como benchmark de red ni como cifra de producción.
 
 Las contraseñas del `.env` de ejemplo son únicamente para la demo local. No usar estos valores en un servidor expuesto a Internet.

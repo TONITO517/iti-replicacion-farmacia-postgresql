@@ -16,9 +16,9 @@ Presentación breve para un grupo universitario de Ingeniería de Sistemas. Comp
 
 ## Diapositiva 3 - Tecnología elegida
 
-**En pantalla:** PostgreSQL 16, replicación lógica nativa, Docker Compose y pgAdmin 4.
+**En pantalla:** PostgreSQL 18, replicación lógica nativa, dos clústeres locales y pgAdmin 4.
 
-**Qué explicar:** PostgreSQL se eligió por su replicación lógica, documentación y herramientas accesibles. pgAdmin administra las instancias; Docker las ejecuta separadas.
+**Qué explicar:** PostgreSQL se eligió por su replicación lógica, documentación y herramientas accesibles. pgAdmin administra las instancias; dos clústeres locales independientes representan las sedes.
 
 ## Diapositiva 4 - Arquitectura
 

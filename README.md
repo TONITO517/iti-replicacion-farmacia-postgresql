@@ -2,49 +2,41 @@
 
 Proyecto universitario de Infraestructura de TI: demostración académica de dos nodos PostgreSQL activos que intercambian cambios mediante replicación lógica.
 
-## Escenario
+## Escenario y alcance
 
-Una farmacia con dos sucursales registra ventas y movimientos de inventario en su propio nodo. Los datos de ambas sedes se replican para que cada nodo mantenga una copia de la información compartida.
+Una farmacia con dos sucursales registra ventas e inventario en su propio nodo. Los cambios se replican para que ambos nodos mantengan una copia de la información compartida. El esquema incluye sucursales, medicamentos, inventario, ventas y detalle de ventas.
 
-## Alcance
-
-- Dos instancias PostgreSQL aisladas y administrables con pgAdmin.
-- Replicación lógica bidireccional entre ambos nodos.
-- Esquema de demostración para sucursales, medicamentos, inventario y ventas.
-- Regla de operación para reducir conflictos: cada sucursal modifica el inventario que le pertenece y cada venta usa un identificador único.
-- Guía de instalación, demostración y diagnóstico.
-- Informe técnico y material de exposición, como entregables separados del código.
-
-El proyecto se desarrollará en esta carpeta y en su propio repositorio. No forma parte de `GYM_CONTROL`.
-
-## Estado
-
-En preparación. Se validó el archivo de Compose con `docker compose config --quiet`. Docker Desktop está instalado, pero el motor devolvió un error de API en el último intento; por eso todavía no se ha probado la ejecución de los nodos ni la replicación real.
-
-## Estructura prevista
-
-```text
-database/       Esquema y datos demostrativos
-scripts/        Inicio, configuración y verificación de los nodos
-docs/           Arquitectura, instalación y guía de exposición
-informe/        Informe técnico del proyecto
-presentacion/   Material de exposición
-```
+El equipo ya tiene PostgreSQL 18.6 instalado. El proyecto usa esa instalación para crear dos clústeres de datos independientes en los puertos 5433 y 5434. Los archivos de datos quedan en `%LOCALAPPDATA%\FarmaciaReplicacion`; la instancia existente en 5432 y `BOLETA_VENTAS` no se modifican.
 
 ## Inicio rápido
 
-Con Docker Desktop abierto y el motor Linux activo, ejecutar en PowerShell:
+Abre PowerShell en esta carpeta y ejecuta:
 
 ```powershell
 .\scripts\iniciar.ps1
 ```
 
-Luego registrar en pgAdmin `127.0.0.1:5433` (Nodo A) y `127.0.0.1:5434` (Nodo B). Las instrucciones completas, incluida la demostración en ambos sentidos, están en [`docs/instalacion.md`](docs/instalacion.md).
+En la primera ejecución, se crea `.env` desde `.env.example`; revisa la ruta `PG_BIN` si PostgreSQL está instalado en otro directorio. Después registra los nodos en pgAdmin:
 
-## Pruebas
+| Campo | Nodo A | Nodo B |
+|---|---|---|
+| Host | `127.0.0.1` | `127.0.0.1` |
+| Puerto | `5433` | `5434` |
+| Base | `farmacia` | `farmacia` |
+| Usuario | `farmacia_admin` | `farmacia_admin` |
 
-El plan incluye replicación en ambos sentidos, integridad, interrupción temporal y un conflicto único controlado con recuperación. Los resultados que requieren ejecutar Docker siguen pendientes; ver [`docs/plan_pruebas.md`](docs/plan_pruebas.md).
+Las contraseñas de ejemplo están en `.env` local. La guía con demostración, diagnóstico y detención está en [`docs/instalacion.md`](docs/instalacion.md). Diagrama: [`docs/arquitectura.svg`](docs/arquitectura.svg).
 
-## Importante
+## Estructura
 
-Esta es una demostración local para fines académicos. La topología activa-activa necesita reglas de escritura para evitar que dos sucursales cambien simultáneamente la misma fila. La replicación lógica nativa también puede detenerse si un cambio entrante viola una restricción; el informe describirá esta limitación y el procedimiento de resolución elegido.
+- `database/`: esquema, publicaciones y datos de demostración/conflicto.
+- `scripts/`: inicio, detención, verificación y medición.
+- `docs/`: arquitectura, instalación, pruebas y resolución de conflictos.
+- `informe/`: informe técnico en Markdown.
+- `presentacion/`: guion de exposición oral.
+
+## Estado
+
+Los dos clústeres se iniciaron y se probaron la replicación en ambos sentidos, las escrituras concurrentes, la interrupción temporal, la recuperación de un conflicto y una medición básica. Falta guardar capturas desde pgAdmin; ver [`docs/seguimiento_entregables.md`](docs/seguimiento_entregables.md) y [`docs/plan_pruebas.md`](docs/plan_pruebas.md). No se deben presentar resultados pendientes como ya medidos.
+
+Este proyecto está en su propia carpeta y repositorio, separado de `GYM_CONTROL`. Es una demostración académica local con datos ficticios, no una configuración de producción.

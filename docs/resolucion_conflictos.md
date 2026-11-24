@@ -17,7 +17,7 @@ La prueba usa dos medicamentos ficticios con UUID diferentes, pero el mismo `cod
 1. En Query Tool del Nodo A ejecutar `ALTER SUBSCRIPTION sub_desde_nodo_b DISABLE;`. En Nodo B ejecutar `ALTER SUBSCRIPTION sub_desde_nodo_a DISABLE;`.
 2. Ejecutar `database/conflicto_nodo_a.sql` en Nodo A y `database/conflicto_nodo_b.sql` en Nodo B.
 3. En Nodo A ejecutar `ALTER SUBSCRIPTION sub_desde_nodo_b ENABLE;`; en Nodo B ejecutar `ALTER SUBSCRIPTION sub_desde_nodo_a ENABLE;`. Cada nodo intentará recibir el medicamento de la otra sucursal y el worker chocará con la restricción única `medicamento_codigo_key`.
-4. Revisar el registro con `docker compose logs nodo-a nodo-b` y `pg_stat_subscription_stats` en pgAdmin. Guardar la evidencia del error.
+4. Revisar `%LOCALAPPDATA%\FarmaciaReplicacion\nodo-a\server.log`, `nodo-b\server.log` y `pg_stat_subscription_stats` en pgAdmin. Guardar la evidencia del error.
 5. Deshabilitar otra vez ambas suscripciones como en el paso 1. En Nodo A ejecutar:
 
    ```sql

@@ -97,10 +97,10 @@ def add_architecture_diagram(document):
 
     table = document.add_table(rows=1, cols=3)
     table.style = "Table Grid"
-    set_cell_text(table.cell(0, 0), "NODO A\nPostgreSQL 16\nPuerto local 5433", bold=True, color=NAVY, size=10)
+    set_cell_text(table.cell(0, 0), "NODO A\nPostgreSQL 18\nPuerto local 5433", bold=True, color=NAVY, size=10)
     shade(table.cell(0, 0), PALE)
     set_cell_text(table.cell(0, 1), "Publicación  ⇄  Suscripción\nReplicación lógica\nOrigen = none", bold=True, color=TEAL, size=9)
-    set_cell_text(table.cell(0, 2), "NODO B\nPostgreSQL 16\nPuerto local 5434", bold=True, color=NAVY, size=10)
+    set_cell_text(table.cell(0, 2), "NODO B\nPostgreSQL 18\nPuerto local 5434", bold=True, color=NAVY, size=10)
     shade(table.cell(0, 2), PALE)
 
     caption = document.add_paragraph()
